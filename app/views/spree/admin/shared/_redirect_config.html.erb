@@ -1,4 +1,1 @@
-<tr>
-  <td><%= link_to t("redirects"), admin_redirects_path %></td>
-  <td><%= t("explain_redirects") %></td>
-</tr>
+<%= configurations_sidebar_menu_item(Spree.t(:redirects), spree.admin_redirects_path) if can? :manage, Spree::Redirect %>

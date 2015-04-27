@@ -1,26 +1,11 @@
-<%= render :partial => 'spree/admin/shared/configuration_menu' unless request.xhr? %>
+<%= render :partial => 'spree/admin/shared/error_messages', :locals => { :target => @redirect } %>
 
-<h3><%= t '.new_redirect' %></h3>
-
-<%= render 'spree/shared/error_messages', :target => @redirect %>
+<% content_for :page_title do %>
+  <%= Spree.t(:new_redirect) %>
+<% end %>
 
 <%= form_for([:admin, @redirect]) do |f| %>
   <%= render "form", :form => f %>
-  <p class="form-buttons">
-    <%= button t('create') %> <%= t('or') %> <%= link_to t('cancel'), collection_url %>
-  </p>
+  <%= render :partial => 'spree/admin/shared/new_resource_links' %>
 <% end %>
 
-<% if request.xhr? %>
-  <script type="text/javascript">
-  //<![CDATA[
-    (function($){
-      $("#new_spree_redirect .form-buttons a").click(function(evt) {
-        evt.preventDefault();
-        $("#new_redirect_form").empty();
-        $("#new_redirect_link").show();
-      });
-    })(jQuery);
-  //]]>
-  </script>
-<% end %>

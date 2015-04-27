@@ -1,47 +1,65 @@
-<%= render :partial => 'spree/admin/shared/configuration_menu' %>
-
-<h1>Listing Redirects</h1>
-
-<table class="index">
-  <thead>
-	<tr>
-    	<th><%= sort_link @search, :old_url,  t('redirect.old_url') %></th>
-    	<th><%= sort_link @search, :new_url, t('redirect.new_url') %></th>
-    	<th><%= t('action') %></th>
-	</tr>
-  </thead>
-  <tbody>
-    <%- @collection.each do |redirect|%>
-    <tr id="<%= dom_id redirect %>">
-      <td><%= redirect.old_url %></td>
-      <td><%= redirect.new_url %></td>
-      <td>
-      	<%= link_to_edit redirect %> &nbsp;
-      	<%= link_to_delete redirect %>
-      </td>
-    </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<%= paginate @collection %>
-
-<div id="new_redirect_form"></div>
-<br/>
-<p>
-  <%= link_to icon('add') + ' ' + t(".new_redirect"), new_admin_redirect_url, :id => "new_redirect_link" %>
-</p>
-
-<% content_for :head do %>
-  <script type="text/javascript">
-    jQuery(document).ready(function(){  
-      
-      jQuery('#new_redirect_link').click(function(event) { 
-        event.preventDefault();
-        jQuery(this).hide();
-        jQuery.ajax({type: 'GET', url: this.href, data: ({authenticity_token: AUTH_TOKEN}), success: function(r){ jQuery('#new_redirect_form').html(r);} });
-      });
-      
-    });
-  </script>
+<% content_for :page_title do %>
+  <%= plural_resource_name(Spree::Redirect) %>
 <% end %>
+
+<% content_for :page_actions do %>
+  <%= button_link_to Spree.t(:new_redirect), new_object_url, { :class => "btn-success", :icon => 'add', :id => 'admin_new_redirect' } %>
+<% end if can?(:create, Spree::Redirect) %>
+
+<% content_for :table_filter do %>
+  <div data-hook="admin_redirects_sidebar">
+    <%= search_form_for [:admin, @search] do |f| %>
+      <%- locals = {:f => f} %>
+      <div data-hook="admin_products_index_search" class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= f.label :old_url_cont, Spree.t(:old_url) %>
+            <%= f.text_field :old_url_cont, :size => 15, class: "form-control js-quick-search-target" %>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <%= f.label :new_url_cont, Spree.t(:new_url) %>
+            <%= f.text_field :new_url_cont, :size => 15, class: "form-control js-quick-search-target" %>
+          </div>
+        </div>
+      </div>
+      <div data-hook="admin_products_index_search_buttons" class="form-actions">
+        <%= button Spree.t(:search), 'search' %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<%= render partial: 'spree/admin/shared/index_table_options', locals: { collection: @collection } %>
+
+<% if @collection.any? %>
+  <table class="table" id="listing_redirects">
+    <thead>
+      <tr data-hook="admin_redirects_index_headers">
+        <th><%= sort_link @search, :old_url, Spree.t(:old_url) %></th>
+        <th><%= sort_link @search, :new_url, Spree.t(:new_url) %></th>
+        <th data-hook="admin_redirects_index_header_actions" class="actions"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <%- @collection.each do |redirect|%>
+      <tr id="<%= dom_id redirect %>" data-hook="admin_redirects_index_rows" class="<%= cycle('odd', 'even') %>">
+        <td><%= redirect.old_url %></td>
+        <td><%= redirect.new_url %></td>
+        <td>
+          <%= link_to_edit redirect, no_text: true, class: 'edit' if can?(:edit, redirect) %>
+          <%= link_to_delete redirect, no_text: true if can?(:delete, redirect) %>
+        </td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="alert alert-info no-objects-found">
+    <%= Spree.t(:no_resource_found, resource: plural_resource_name(Spree::Redirect)) %>,
+    <%= link_to Spree.t(:add_one), new_object_url %>!
+  </div>
+<% end %>
+
+<%= render partial: 'spree/admin/shared/index_table_options', locals: { collection: @collection } %>
